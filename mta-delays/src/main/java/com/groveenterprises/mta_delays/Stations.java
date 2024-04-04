@@ -19,7 +19,6 @@ public class Stations {
 			f = new FileReader(STATIONS_FILE);
 			BufferedReader in = new BufferedReader(f);
 			String ln = in.readLine();
-			in.readLine(); // skip header row
 			while (ln != null) {
 				String[] stationParts = ln.split(",");
 				stations.add(new Station(stationParts[0], stationParts[1].charAt(0), stationParts[2], stationParts[3].charAt(0), stationParts[4]));
