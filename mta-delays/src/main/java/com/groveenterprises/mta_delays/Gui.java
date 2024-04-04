@@ -55,8 +55,6 @@ public class Gui extends JFrame {
         selections.add(scrollPane);
 	}
 	private void setUpStations() {
-		
-		
 		stationsList = new JList<String>();
 		stationsList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		JScrollPane scrollPane = new JScrollPane(stationsList);
@@ -72,8 +70,6 @@ public class Gui extends JFrame {
 			if (s.getLine() == line)
 				filteredStationNames.add(s.getStopName());
 		}
-
-		
 		
 		String[] stringStations = new String[filteredStationNames.size()];
 		filteredStationNames.toArray(stringStations);
