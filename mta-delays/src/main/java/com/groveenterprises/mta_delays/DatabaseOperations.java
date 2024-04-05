@@ -37,6 +37,16 @@ public class DatabaseOperations {
 	public static String[] getLines() {
 		return executeQueryWithSingleResultColumn("SELECT line FROM apis ORDER BY line");
 	}
+	
+	public static String getStopID(String line, String stopName, String direction) {
+		if (line == null || line.isEmpty() || stopName == null || stopName.isEmpty() ||
+				direction == null || direction.isEmpty())
+			return null;
+		String[] stopIDs = executeQueryWithSingleResultColumn("SELECT distinct stopID FROM stations " +
+			"WHERE line = ? AND stopName = ? AND direction = ?", line, stopName, direction);
+		return (stopIDs.length == 0) ? null : stopIDs[0];
+			
+	}
 
 	/**
 	 * Returns all stations on a given line. Stations ordered alphanumerically
@@ -68,7 +78,8 @@ public class DatabaseOperations {
 	 * @return api : String
 	 */
 	public static String getAPI(String line) {
-		if (line == null || line.isEmpty()) throw new IllegalArgumentException("Line cannot be null or empty");
+		if (line == null || line.isEmpty())
+			throw new IllegalArgumentException("Line cannot be null or empty");
 		String[] apis = executeQueryWithSingleResultColumn("SELECT api FROM apis WHERE line = ?", line);
 		return (apis.length == 0) ? null : apis[0];
 	}

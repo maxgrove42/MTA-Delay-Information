@@ -121,9 +121,12 @@ public class TrainTimeDisplay extends JFrame {
 		if (station == null || line == null || direction == null) {
 			//display nothing.
 		} else {
-			//get trackID from sql
-			//go query that in the GTFS database
-			//bold the next trains on the selected line that are coming
+			//TODO
+			String[] output = GtfsQuery.getNextTrainTimes(line, station, direction);
+			System.out.println("Next " + line + " trains to arrive at " + station + " towards " + direction + ":");
+			for (String s : output) {
+				System.out.println(s);
+			}
 		}
 	}
 	
