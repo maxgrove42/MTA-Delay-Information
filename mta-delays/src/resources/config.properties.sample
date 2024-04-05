@@ -1,0 +1,11 @@
+# Configuration properties for met-delays project
+
+# API Key for accessing the GTFS Realtime Feed
+gtfs.api.key=YOUR_API_KEY_HERE
+
+# Other configuration parameters can be added below
+database.url=jdbc:mysql://localhost:3306/mydatabase
+database.user=dbusername
+database.password=dbpwd
+
+# additional settings you may want to include

@@ -3,28 +3,24 @@ package com.groveenterprises.mta_delays;
 import java.awt.*;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.*;
 import javax.swing.*;
 
-public class Gui extends JFrame {
+public class TrainTimeDisplay extends JFrame {
 
+	private static final long serialVersionUID = 1L;
+	
 	private static final int FRAME_WIDTH = 700;
 	private static final int FRAME_HEIGHT = 700;
-	
-	private static Map<Character, String> LINES;
-	private static ArrayList<Station> STATIONS;
 	
 	private JFrame frame = new JFrame();
     JPanel selections = new JPanel();
     JPanel times = new JPanel();
-    JList<Character> linesList;
+    
+    JList<String> linesList;
     JList<String> stationsList;
     JList<String> directionsList;
 	
-	public Gui() throws FileNotFoundException, IOException {
-		
-		LINES = Lines.getLines();
-		STATIONS = (new Stations()).getStations();
+	public TrainTimeDisplay() throws FileNotFoundException, IOException {
 		
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(FRAME_WIDTH, FRAME_HEIGHT);
@@ -45,11 +41,8 @@ public class Gui extends JFrame {
 	}
 	
 	private void setUpLines() {
-		Character[] charLines = new Character[LINES.keySet().size()];
-		LINES.keySet().toArray(charLines);
-		Arrays.sort(charLines);
 		
-		linesList = new JList<>(charLines);
+		linesList = new JList<>(DatabaseOperations.getLines());
 		
 		linesList.addListSelectionListener(e -> {
 			if (!e.getValueIsAdjusting())
@@ -62,6 +55,7 @@ public class Gui extends JFrame {
         selections.add(scrollPane);
 	}
 	private void setUpStations() {
+
 		stationsList = new JList<String>();
 		stationsList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		
@@ -86,6 +80,7 @@ public class Gui extends JFrame {
 		JScrollPane scrollPane = new JScrollPane(directionsList);
 		selections.add(scrollPane);
 	}
+	
 	private void setUpDisplayTimes() {
 		JPanel selectedTrainTimes = new JPanel();
 		
@@ -98,53 +93,43 @@ public class Gui extends JFrame {
 	}
 	
 	private void displayStations() {
-		Set<String> filteredStationNames = new HashSet<String>();
 
-		Character line = linesList.getSelectedValue();
+		String line = linesList.getSelectedValue();
 		
 		if (line == null) {
 			stationsList.setListData(new String[0]); //set list to empty array
 		} else {
-			
-			for (Station s : STATIONS) {
-				if (s.getLine() == line)
-					filteredStationNames.add(s.getStopName());
-			}
-			
-			String[] stringStations = new String[filteredStationNames.size()];
-			filteredStationNames.toArray(stringStations);
-			Arrays.sort(stringStations);
-			stationsList.setListData(stringStations);
+			stationsList.setListData(DatabaseOperations.getStations(line));
 		}
 		
 		//selections.repaint();
 	}
 	private void displayDirections() {
-		Set<String> directions = new HashSet<String>();
 		String station = stationsList.getSelectedValue();
-		Character line = linesList.getSelectedValue();
+		String line = linesList.getSelectedValue();
 
 		if (station == null) {
 			directionsList.setListData(new String[0]); //set list to empty array
 		} else {
-		
-			for (Station s : STATIONS) {
-				if (s.getStopName().equals(station) && s.getLine() == line && !s.getDirection().equals("Last Stop"))
-					directions.add(s.getDirection());
-			}
-			String[] stringDirections = new String[directions.size()];
-			directions.toArray(stringDirections);
-			Arrays.sort(stringDirections);
-			directionsList.setListData(stringDirections);
+			directionsList.setListData(DatabaseOperations.getDirections(line, station));
 		}
 	}
 	private void displayNextTrains() {
-		
+		String station = stationsList.getSelectedValue();
+		String line = linesList.getSelectedValue();
+		String direction = directionsList.getSelectedValue();
+		if (station == null || line == null || direction == null) {
+			//display nothing.
+		} else {
+			//get trackID from sql
+			//go query that in the GTFS database
+			//bold the next trains on the selected line that are coming
+		}
 	}
 	
 	
 	public static void main(String[] args) throws FileNotFoundException, IOException {
-		Gui g = new Gui();
+		TrainTimeDisplay ttd = new TrainTimeDisplay();
 	}
 
 }
