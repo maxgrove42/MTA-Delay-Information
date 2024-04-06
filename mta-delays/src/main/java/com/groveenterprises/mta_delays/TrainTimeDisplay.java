@@ -4,6 +4,7 @@ import java.awt.*;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import javax.swing.*;
+import java.util.*;
 
 public class TrainTimeDisplay extends JFrame {
 
@@ -19,6 +20,7 @@ public class TrainTimeDisplay extends JFrame {
     JList<String> linesList;
     JList<String> stationsList;
     JList<String> directionsList;
+    JList<String> nextTrainsList;
 	
 	public TrainTimeDisplay() throws FileNotFoundException, IOException {
 		
@@ -37,6 +39,7 @@ public class TrainTimeDisplay extends JFrame {
 		
 		selections.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         frame.add(selections, BorderLayout.NORTH);
+        frame.add(times, BorderLayout.CENTER);
         frame.setVisible(true);
 	}
 	
@@ -73,8 +76,11 @@ public class TrainTimeDisplay extends JFrame {
 		directionsList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		
 		directionsList.addListSelectionListener(e -> {
-			if (!e.getValueIsAdjusting())
-				displayNextTrains();
+			if (!e.getValueIsAdjusting()) { 
+				LinkedList<NextTrainUpdate> nextTrains = getNextTrains();
+				displayTrainUpdates(nextTrains);
+			}
+			
 		});
 		
 		JScrollPane scrollPane = new JScrollPane(directionsList);
@@ -82,14 +88,10 @@ public class TrainTimeDisplay extends JFrame {
 	}
 	
 	private void setUpDisplayTimes() {
-		JPanel selectedTrainTimes = new JPanel();
-		
-		final JTextArea textArea = new JTextArea(1, 1);
-		textArea.setEditable(false);
-		JScrollPane scrollPane = new JScrollPane(textArea);
-		selectedTrainTimes.add(scrollPane);
-		selectedTrainTimes.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
-	    times.add(scrollPane);  
+		nextTrainsList = new JList<String>();
+		nextTrainsList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		JScrollPane scrollPane = new JScrollPane(nextTrainsList);
+		times.add(scrollPane);  
 	}
 	
 	private void displayStations() {
@@ -101,8 +103,6 @@ public class TrainTimeDisplay extends JFrame {
 		} else {
 			stationsList.setListData(DatabaseOperations.getStations(line));
 		}
-		
-		//selections.repaint();
 	}
 	private void displayDirections() {
 		String station = stationsList.getSelectedValue();
@@ -114,20 +114,28 @@ public class TrainTimeDisplay extends JFrame {
 			directionsList.setListData(DatabaseOperations.getDirections(line, station));
 		}
 	}
-	private void displayNextTrains() {
+	
+	private LinkedList<NextTrainUpdate> getNextTrains() {
 		String station = stationsList.getSelectedValue();
 		String line = linesList.getSelectedValue();
 		String direction = directionsList.getSelectedValue();
 		if (station == null || line == null || direction == null) {
-			//display nothing.
+			//return an empty LinkedList
+			return new LinkedList<NextTrainUpdate>();
 		} else {
-			//TODO
-			String[] output = GtfsQuery.getNextTrainTimes(line, station, direction);
-			System.out.println("Next " + line + " trains to arrive at " + station + " towards " + direction + ":");
-			for (String s : output) {
-				System.out.println(s);
-			}
+			return GtfsQuery.getNextTrainTimes(line, station, direction);
 		}
+	}
+	private void displayTrainUpdates(LinkedList<NextTrainUpdate> nextTrains) {
+		String[] nextTrainsArray = new String[nextTrains.size()];
+		int i = 0;
+		for (NextTrainUpdate ntu : nextTrains) {
+			String s = ntu.getMinutesAway() + " min, " + ntu.getSecondsAway() + " sec (" +
+		
+					ntu.getLine() + " train)";
+			nextTrainsArray[i++] = s;
+		}
+		nextTrainsList.setListData(nextTrainsArray);
 	}
 	
 	

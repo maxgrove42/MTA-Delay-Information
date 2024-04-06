@@ -12,33 +12,22 @@ import com.google.transit.realtime.GtfsRealtime.TripUpdate.*;
 public class GtfsQuery {
 	
 	
-	public static String[] getNextTrainTimes(String line, String stopName, String direction) {
+	public static LinkedList<NextTrainUpdate> getNextTrainTimes(String line, String stopName, String direction) {
 		URL url;
 		String api = DatabaseOperations.getAPI(line);
 		String stopID = DatabaseOperations.getStopID(line, stopName, direction);
-		List<String> nextTrainTimes = new LinkedList<String>();
+		LinkedList<NextTrainUpdate> nextTrainTimes = new LinkedList<NextTrainUpdate>();
 		try {
 			url = new URL(api);
 			FeedMessage feed = FeedMessage.parseFrom(url.openStream());
 			for (FeedEntity entity : feed.getEntityList()) {
 			      if (entity.hasTripUpdate()) {
 			    	TripUpdate tripUpdate = entity.getTripUpdate();
-			    	if (tripUpdate.getTrip().hasRouteId() &&
-			    			tripUpdate.getTrip().getRouteId().equals(line)) {
-			    		for (StopTimeUpdate stu : tripUpdate.getStopTimeUpdateList()) {
-			    			if (stu.hasStopId() && stu.getStopId().equals(stopID) &&
-			    					stu.hasArrival() && stu.getArrival().getTime() * 1000 > System.currentTimeMillis()) {
-			    				Long timeUntilArrivalInMilli = stu.getArrival().getTime() * 1000 - System.currentTimeMillis();
-			    				double timeUntilArrivalInMinutes = timeUntilArrivalInMilli / 1000.0 / 60.0;
-			    				int minutes = (int)timeUntilArrivalInMinutes;
-			    				int seconds = (int)((timeUntilArrivalInMinutes - minutes) * 60);
-			    				
-			    				if (minutes == 0) {
-			    					nextTrainTimes.add(seconds + " sec");
-			    				} else {
-			    					nextTrainTimes.add(minutes + " min, " + seconds + " sec");
-			    				}
-			    			}
+			    	String tripUpdateLine = tripUpdate.getTrip().getRouteId();
+			    	for (StopTimeUpdate stu : tripUpdate.getStopTimeUpdateList()) {
+			    		if (stu.hasStopId() && stu.getStopId().equals(stopID) &&
+		    					stu.hasArrival() && stu.getArrival().getTime() * 1000 > System.currentTimeMillis()) {
+			    			nextTrainTimes.add(new NextTrainUpdate(stopID, tripUpdateLine, stu.getArrival().getTime()));
 			    		}
 			    	}
 			      }
@@ -50,22 +39,23 @@ public class GtfsQuery {
 			e.printStackTrace();
 			throw new RuntimeException("Error when accessing the URL API.");
 		}
-		
-
-		//lookup the stopID and use the private helper function
-		return nextTrainTimes.toArray(new String[0]);
+		//return the trains in sorted order since GTFS will default to train order
+		//  and some tracks might share trains
+		nextTrainTimes.sort((e1, e2) -> Long.compare(e1.getTimeUntilArrival(), e2.getTimeUntilArrival()));
+		return nextTrainTimes;
 	}
 	
 
 	public static void main(String[] args) {
-		String line = "7";
-		String station = "5 Av";
-		String direction = "Queens";
+		String line = "N";
+		String station = "Times Sq-42 St";
+		String direction = "Uptown";
 		
-		String[] output = GtfsQuery.getNextTrainTimes(line, station, direction);
-		System.out.println("Next " + line + " trains to arrive at " + station + " towards " + direction + ":");
-		for (String s : output) {
-			System.out.println(s);
+		System.out.println("Next trains to arrive at " + station + " towards " + direction + ":");
+		for (NextTrainUpdate ntu : GtfsQuery.getNextTrainTimes(line, station, direction)) {
+			System.out.print(ntu.getMinutesAway() + " mins, ");
+			System.out.print(ntu.getSecondsAway() + " secs ");
+			System.out.print("(" + ntu.getLine() + " train)\n");
 		}
 	}
 
