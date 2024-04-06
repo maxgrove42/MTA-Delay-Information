@@ -1,13 +1,14 @@
 package com.groveenterprises.mta_delays;
 
-/**
- * Hello world!
- *
- */
+import com.groveenterprises.mta_delays.ClientTools.*;
+import com.groveenterprises.mta_delays.ServerTools.*;
+
 public class App 
 {
     public static void main( String[] args )
     {
-        System.out.println( "Hello World!" );
+    	new Server();
+    	new TrainTimeDisplay();
+    	new TrainTimeDisplay();
     }
 }
