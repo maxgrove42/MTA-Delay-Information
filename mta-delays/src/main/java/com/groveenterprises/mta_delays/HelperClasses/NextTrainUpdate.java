@@ -1,6 +1,10 @@
-package com.groveenterprises.mta_delays;
+package com.groveenterprises.mta_delays.HelperClasses;
 
-public class NextTrainUpdate {
+import java.io.Serializable;
+
+public class NextTrainUpdate implements Serializable {
+
+	private static final long serialVersionUID = 1L;
 
 	//Stop ID (i.e. 501N)
 	private String stopID;
@@ -8,7 +12,7 @@ public class NextTrainUpdate {
 	//Train line (i.e. "7" or "N")
 	private String line;
 	
-	//Seconds away (Double since Epoch)
+	//Seconds until train arrives
 	private Long timeUntilArrival;
 	
 	

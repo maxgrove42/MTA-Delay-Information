@@ -1,5 +1,7 @@
-package com.groveenterprises.mta_delays;
+package com.groveenterprises.mta_delays.DatabaseTools;
 import java.sql.*;
+
+import com.groveenterprises.mta_delays.ConfigurationTools.*;
 
 public class DatabaseConnector {
 

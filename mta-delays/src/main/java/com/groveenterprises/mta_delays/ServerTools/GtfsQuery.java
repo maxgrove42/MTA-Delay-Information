@@ -1,18 +1,22 @@
-package com.groveenterprises.mta_delays;
+package com.groveenterprises.mta_delays.ServerTools;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.text.SimpleDateFormat;
-import java.time.Instant;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import com.google.transit.realtime.GtfsRealtime.*;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.*;
+import com.groveenterprises.mta_delays.DatabaseTools.*;
+import com.groveenterprises.mta_delays.HelperClasses.NextTrainUpdate;
+import com.groveenterprises.mta_delays.HelperClasses.TrainTrackLine;
 
 public class GtfsQuery {
 	
 	
-	public static LinkedList<NextTrainUpdate> getNextTrainTimes(String line, String stopName, String direction) {
+	public static LinkedList<NextTrainUpdate> getNextTrainTimes(TrainTrackLine trainTrack) {
+		String line = trainTrack.getLine();
+		String stopName = trainTrack.getStopName();
+		String direction = trainTrack.getDirection();
+		
 		URL url;
 		String api = DatabaseOperations.getAPI(line);
 		String stopID = DatabaseOperations.getStopID(line, stopName, direction);
@@ -52,7 +56,7 @@ public class GtfsQuery {
 		String direction = "Uptown";
 		
 		System.out.println("Next trains to arrive at " + station + " towards " + direction + ":");
-		for (NextTrainUpdate ntu : GtfsQuery.getNextTrainTimes(line, station, direction)) {
+		for (NextTrainUpdate ntu : GtfsQuery.getNextTrainTimes(new TrainTrackLine(line, station, direction))) {
 			System.out.print(ntu.getMinutesAway() + " mins, ");
 			System.out.print(ntu.getSecondsAway() + " secs ");
 			System.out.print("(" + ntu.getLine() + " train)\n");
