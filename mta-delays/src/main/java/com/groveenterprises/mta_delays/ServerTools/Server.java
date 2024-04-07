@@ -1,5 +1,4 @@
 package com.groveenterprises.mta_delays.ServerTools;
-
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -10,7 +9,7 @@ import com.groveenterprises.mta_delays.HelperClasses.*;
 
 //should add a server window to stop / start server.
 public class Server implements Runnable {
-
+	
 	public Server() {
 		Thread t = new Thread(this);
 		t.start();
@@ -31,7 +30,6 @@ public class Server implements Runnable {
 		} catch (IOException ioe) {
 			ioe.printStackTrace();
 		}
-
 	}
 
 	private class ClientHandler implements Runnable {
@@ -48,7 +46,6 @@ public class Server implements Runnable {
 
 				//outputToClient
 				outputToClient = new ObjectOutputStream(socket.getOutputStream());
-
 
 				// Read a trainTrackLine Update from client.
 				Object object = inputFromClient.readObject();
@@ -78,12 +75,10 @@ public class Server implements Runnable {
 						e.printStackTrace();
 					}
 				}
-
 			}
-
 		}
-
 	}
+	
 	public static void main(String[] args) {
 	    Server mts = new Server();
 	}
