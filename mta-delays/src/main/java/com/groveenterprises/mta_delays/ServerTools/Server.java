@@ -51,6 +51,10 @@ public class Server implements Runnable {
 				Object object = inputFromClient.readObject();
 				TrainTrackLine ttl = (TrainTrackLine)object;
 
+				/*
+				* Try to pull it from the database first.
+    				* If db is empty, go to the Gtfs query.
+				*/
 				LinkedList<NextTrainUpdate> ntu = GtfsQuery.getNextTrainTimes(ttl);
 
 				//write a LinkedList<NextTrainUpdate> to client
