@@ -12,8 +12,8 @@ public class NextTrainUpdate implements Serializable {
 	//Train line (i.e. "7" or "N")
 	private String line;
 	
-	//Seconds until train arrives
-	private Long timeUntilArrival;
+	//arrival time of the train
+	private Long arrivalTime;
 	
 	
 	/**
@@ -25,9 +25,15 @@ public class NextTrainUpdate implements Serializable {
 	public NextTrainUpdate(String stopID, String line, Long arrivalTime) {
 		this.stopID = stopID;
 		this.line = line;
-		
-		Long timeUntilArrivalInMilli = arrivalTime * 1000 - System.currentTimeMillis();
-		this.timeUntilArrival = timeUntilArrivalInMilli / 1000L;
+		this.arrivalTime = arrivalTime;
+	}
+	
+	/**
+	 * Returns the arrival time in milliseconds since epoch
+	 * @return Long
+	 */
+	public Long getArrivalTime() {
+		return arrivalTime;
 	}
 	
 	public String getStopID() {
@@ -38,14 +44,15 @@ public class NextTrainUpdate implements Serializable {
 		return line;
 	}
 	public Long getTimeUntilArrival() {
-		return timeUntilArrival;
+		Long timeUntilArrivalInMilli = arrivalTime * 1000 - System.currentTimeMillis();
+		return timeUntilArrivalInMilli / 1000L;
 	}
 	public int getMinutesAway() {
-		return (int)(timeUntilArrival / 60);
+		return (int)(getTimeUntilArrival() / 60);
 	}
 
 	public int getSecondsAway() {
-		return (int)(((timeUntilArrival) - getMinutesAway() * 60));
+		return (int)(((getTimeUntilArrival()) - getMinutesAway() * 60));
 	}
 
 }

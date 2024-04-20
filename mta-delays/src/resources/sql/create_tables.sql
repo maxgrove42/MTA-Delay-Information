@@ -1,8 +1,12 @@
 create database if not exists mtaDelays;
 use mtaDelays;
+drop table if exists arrivalTimeCache;
+drop table if exists lastUpdate;
 drop table if exists stations;
 drop table if exists apis;
 drop table if exists boroughs;
+
+
 
 create table stations (
     stopID		varchar(5),
@@ -23,4 +27,19 @@ create table boroughs (
     borough		varchar(3),
     boroughName		varchar(40),
     primary key (borough)
+);
+
+	create table lastUpdate (
+		stopID		varchar(10),
+		lastUpdate	DATETIME DEFAULT current_timestamp,
+		PRIMARY KEY (stopID),
+		FOREIGN KEY (stopID) references stations (stopID)
+	);
+
+create table arrivalTimeCache (
+    stopID		varchar(10),
+    line		varchar(10),
+    arrivalTime	BIGINT,
+	PRIMARY KEY (stopID, line, arrivalTime),
+    FOREIGN KEY (stopID, line) references stations (stopID, line)
 );

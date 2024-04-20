@@ -179,7 +179,7 @@ public class TrainTimeDisplay extends JFrame {
 	}
 
 	private LinkedList<NextTrainUpdate> getNextTrainTimesFromServer(TrainTrackLine ttl) {
-		System.out.println("Sending client request.");
+		System.out.println("Sending client request for " + DatabaseOperations.getStopID(ttl));
 		try (Socket socket = new Socket(Configuration.getServerAddress(), Configuration.getServerSocketPort());
 				ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
 				ObjectInputStream in = new ObjectInputStream(socket.getInputStream())) {
