@@ -174,13 +174,22 @@ public class DatabaseOperations {
 			return; // Return early if there's nothing to insert
 		} 
 		String query = "INSERT INTO arrivalTimeCache (stopID, line, arrivalTime) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE arrivalTime = VALUES(arrivalTime);";
+		String deleteQuery = "DELETE FROM arrivalTimeCache WHERE stopID = ?";
 		String updateQuery = "INSERT INTO lastUpdate (stopID, lastUpdate) VALUES (?, CURRENT_TIMESTAMP) ON DUPLICATE KEY UPDATE lastUpdate = CURRENT_TIMESTAMP;";
 		Connection conn = null;
 		PreparedStatement stmt = null;
 		PreparedStatement updateStmt = null;
+		PreparedStatement deleteStmt = null;
 		try {
+			String stopID = nextTrains.getFirst().getStopID();
 			conn = DatabaseConnector.getConnection();
 			conn.setAutoCommit(false); // Start transaction
+			
+			//clear out already existing arrivals in the database.
+			deleteStmt = conn.prepareStatement(deleteQuery);
+			deleteStmt.setString(1, stopID);
+			deleteStmt.executeUpdate();
+			
 			stmt = conn.prepareStatement(query);
 			updateStmt = conn.prepareStatement(updateQuery);
 
@@ -192,7 +201,7 @@ public class DatabaseOperations {
 			}
 
 			//now also update the last updated table
-			String stopID = nextTrains.getFirst().getStopID();
+
 			// Update lastUpdate table only once
 			updateStmt.setString(1, stopID);
 			updateStmt.executeUpdate();

@@ -11,37 +11,11 @@ import com.groveenterprises.mta_delays.HelperClasses.TrainTrackLine;
 
 public class GtfsQuery {
 	
-	private static long MAXIMUM_AGE_FROM_DATABASE = 300_000; //in milliseconds
-	
-	public static LinkedList<NextTrainUpdate> getNextTrainTimes(TrainTrackLine trainTrack) {
-		String line = trainTrack.getLine();
-		String stopName = trainTrack.getStopName();
-		String direction = trainTrack.getDirection();
-		
-		//first get update time for stopID. 
-		//if update time is within allowable tolerance
-			//pull from database.
-		//otherwise query from GTFS server and insert into database.
-		String stopID = DatabaseOperations.getStopID(line, stopName, direction);
-		
-		//If last update for a stopID is older than allowable age, delete from database and query from server.
-		//Else use the database values.
-		Long lastUpdated = DatabaseOperations.getLastUpdate(stopID);
-		Long timeAllowance = MAXIMUM_AGE_FROM_DATABASE + (new Date()).getTime();
-		if (lastUpdated == null || Long.compare(lastUpdated, timeAllowance) > 0) {
-			System.out.println("Accessing via API");
-			return queryApiForUpdates(line, stopName, direction);
-		} else {
-			System.out.println("Accessing via Database");
-			return DatabaseOperations.getNextTrainsAtStop(stopID);
-		}
-
-
-        // Return combined or database-only train times
-        
+	public static LinkedList<NextTrainUpdate> queryApiForUpdates(TrainTrackLine ttl) {
+		return queryApiForUpdates(ttl.getLine(), ttl.getStopName(), ttl.getDirection());
 	}
 	
-    private static LinkedList<NextTrainUpdate> queryApiForUpdates(String line, String station, String direction) {
+    public static LinkedList<NextTrainUpdate> queryApiForUpdates(String line, String station, String direction) {
         LinkedList<NextTrainUpdate> nextTrainTimes = new LinkedList<>();
         String api = DatabaseOperations.getAPI(line);
         String stopID = DatabaseOperations.getStopID(line, station, direction);
@@ -79,12 +53,12 @@ public class GtfsQuery {
 	
 
 	public static void main(String[] args) {
-		String line = "N";
-		String station = "Times Sq-42 St";
-		String direction = "Uptown";
+		String line = "7";
+		String station = "46 St-Bliss St";
+		String direction = "Manhattan";
 		
 		System.out.println("Next trains to arrive at " + station + " towards " + direction + ":");
-		for (NextTrainUpdate ntu : GtfsQuery.getNextTrainTimes(new TrainTrackLine(line, station, direction))) {
+		for (NextTrainUpdate ntu : GtfsQuery.queryApiForUpdates(new TrainTrackLine(line, station, direction))) {
 			System.out.print(ntu.getMinutesAway() + " mins, ");
 			System.out.print(ntu.getSecondsAway() + " secs ");
 			System.out.print("(" + ntu.getLine() + " train)\n");

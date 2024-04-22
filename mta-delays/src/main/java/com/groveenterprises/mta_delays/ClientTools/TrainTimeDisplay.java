@@ -163,6 +163,10 @@ public class TrainTimeDisplay extends JFrame {
 			nextTrainsArray = new String[1];
 			nextTrainsArray[0] = "Please select a line, station, and direction.";
 		}
+		else if (nextTrains == null) {
+			nextTrainsArray = new String[1];
+			nextTrainsArray[0] = "Unable to conncet to server. Please check if the server is connected.";
+		}
 		else if (nextTrains.size() == 0) {
 			nextTrainsArray = new String[1];
 			nextTrainsArray[0] = "No upcoming trains";
@@ -179,7 +183,6 @@ public class TrainTimeDisplay extends JFrame {
 	}
 
 	private LinkedList<NextTrainUpdate> getNextTrainTimesFromServer(TrainTrackLine ttl) {
-		System.out.println("Sending client request for " + DatabaseOperations.getStopID(ttl));
 		try (Socket socket = new Socket(Configuration.getServerAddress(), Configuration.getServerSocketPort());
 				ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
 				ObjectInputStream in = new ObjectInputStream(socket.getInputStream())) {
@@ -191,7 +194,7 @@ public class TrainTimeDisplay extends JFrame {
 			return trainUpdates;
 		} catch (IOException | ClassNotFoundException e) {
 			e.printStackTrace();
-			return new LinkedList<NextTrainUpdate>();
+			return null;
 		}
 	}
 	
