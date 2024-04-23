@@ -97,7 +97,7 @@ public class DatabaseOperations {
 	public static String[] getStations(String line) {
 		if (line == null || line.isEmpty())
 			throw new IllegalArgumentException("Line cannot be null or empty");
-		return executeQueryWithSingleResultColumn("SELECT DISTINCT stopName FROM stations WHERE line = ? ORDER BY stopName", line);
+		return executeQueryWithSingleResultColumn("SELECT DISTINCT stopName FROM stations WHERE line = ? GROUP BY stopName", line);
 	}
 
 	/**
