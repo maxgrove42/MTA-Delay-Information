@@ -169,12 +169,8 @@ public class Server extends JFrame {
 			displayMessage("Accessing via Database");
 			return DatabaseOperations.getNextTrainsAtStop(stopID);
 		}
-
-
-        // Return combined or database-only train times
-        
 	}
-
+	
 	public static void main(String[] args) {
 		Server mts = new Server();
 	}

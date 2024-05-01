@@ -41,5 +41,6 @@ create table arrivalTimeCache (
     line		varchar(10),
     arrivalTime	BIGINT,
 	PRIMARY KEY (stopID, line, arrivalTime),
-    FOREIGN KEY (stopID, line) references stations (stopID, line)
+    FOREIGN KEY (stopID) references stations (stopID)
+    -- FOREIGN KEY (line) references apis (line) -- excluding this as the API returns 6X and 7X for express trains!
 );
